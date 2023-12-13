@@ -7,7 +7,6 @@
 
 using namespace sf;
 
-
 enum class Cell { None, Cross, Circle };
 
 const int WindowSize = 600;
@@ -113,31 +112,32 @@ int main(int argc, char** argv)
     // g.set_cell(coord_to_pos(1, 0), CELL_PL1);
     // g.set_cell(coord_to_pos(0, 1), CELL_PL1);
 
+    
+
     g.set_cell(coord_to_pos(7, 7), CELL_ERR);
     g.set_cell(coord_to_pos(8, 8), CELL_ERR);
     g.set_cell(coord_to_pos(8, 7), CELL_ERR);
     g.set_cell(coord_to_pos(7, 8), CELL_ERR);
 
-    g.set_cell(coord_to_pos(7, 0), CELL_PL2);
-    g.set_cell(coord_to_pos(8, 1), CELL_PL2);
-    g.set_cell(coord_to_pos(8, 0), CELL_PL2);
-    g.set_cell(coord_to_pos(7, 1), CELL_PL2);
-
-    g.set_cell(coord_to_pos(0, 0), CELL_PL2);
-    g.set_cell(coord_to_pos(0, 1), CELL_PL2);
-    g.set_cell(coord_to_pos(1, 0), CELL_PL2);
-    g.set_cell(coord_to_pos(1, 1), CELL_PL2);
+    g.set_cell(coord_to_pos(0, 0), CELL_PL1);
+    g.set_cell(coord_to_pos(0, 1), CELL_PL1);
+    g.set_cell(coord_to_pos(1, 0), CELL_PL1);
+    g.set_cell(coord_to_pos(1, 1), CELL_PL1);
 
     g.set_cell(coord_to_pos(2, 0), CELL_PL2);
     g.set_cell(coord_to_pos(3, 0), CELL_PL2);
     g.set_cell(coord_to_pos(2, 1), CELL_PL2);
-    g.set_cell(coord_to_pos(3, 0), CELL_PL2);
+    g.set_cell(coord_to_pos(3, 1), CELL_PL2);
 
     g.set_cell(coord_to_pos(4, 0), CELL_PL2);
     g.set_cell(coord_to_pos(5, 0), CELL_PL2);
     g.set_cell(coord_to_pos(4, 1), CELL_PL2);
+    g.set_cell(coord_to_pos(5, 1), CELL_PL2);
+
+    g.set_cell(coord_to_pos(7, 0), CELL_PL2);
+    g.set_cell(coord_to_pos(8, 1), CELL_PL2);
+    g.set_cell(coord_to_pos(8, 0), CELL_PL2);
     g.set_cell(coord_to_pos(7, 1), CELL_PL2);
-    
 
     g.set_cell(coord_to_pos(0, 7), CELL_ERR);
     g.set_cell(coord_to_pos(1, 8), CELL_ERR);
@@ -149,6 +149,11 @@ int main(int argc, char** argv)
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed) {
                 window.close();
+            } else if (event.type == sf::Event::MouseButtonPressed) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                    std::cout << mousePos.x << std::endl;
+                }
             }
         }
 

@@ -155,7 +155,6 @@ int main(int argc, char** argv)
                     std::cout << mousePos.x << std::endl;
                 }
             }
-        }
 
 
         window.clear(Color::Magenta);
@@ -165,4 +164,5 @@ int main(int argc, char** argv)
 
 
     return 0;
+}
 }

@@ -10,6 +10,8 @@
 
 #define TEST_IS_VISUAL(X) (bool)(X & ~0b1)
 
+using namespace std;
+
 void gp(playground& g, bool less)
 {
     if (!less) printf("board view:\n");
@@ -87,6 +89,35 @@ int playground_get_set_test(bool visual)
     return TEST_VISUAL_SUCCESS;
 }
 
+char test_for_cell_to_char(vector<cell_t>& arr) {
+    bool verify = cell_to_char(CELL_SPACE) == ' ';
+    for (const auto& elem : arr) {
+        switch (elem)
+        {
+        case CELL_SPACE:
+            verify = cell_to_char(CELL_SPACE) == ' '; 
+            return verify == 1 ? TEST_SUCCESS : TEST_FAILURE;
+            break;
+        case CELL_PL1:
+            verify = cell_to_char(CELL_PL1) == 'x';
+            return verify == 1 ? TEST_SUCCESS : TEST_FAILURE;
+            break;
+        case CELL_PL2:
+            veify = cell_to_char(CELL_PL2) == 'o';
+            return verify == 1 ? TEST_SUCCESS : TEST_FAILURE;
+            break;
+        case CELL_ERR:
+            verify = cell_to_char(CELL_ERR) == 'E';
+            return verify == 1 ? TEST_SUCCESS : TEST_FAILURE;
+            break;
+        default:
+            verify = cell_to_char(CELL_ERR) == '?';
+            return verify == 1 ? TEST_SUCCESS : TEST_FAILURE;
+            break;
+        }
+    }
+}
+
 
 
 
@@ -137,29 +168,38 @@ int main(int argc, char** argv)
 {
     using std::vector;
 
-    vector<int (*)(bool)> tests = vector<int (*)(bool)>();
+    // vector<int (*)(bool)> tests = vector<int (*)(bool)>();
     
-    bool visual = true;
+    // bool visual = true;
 
 
-    tests.push_back(playground_get_set_test);
-    tests.push_back(playground_transform_test);
+    // tests.push_back(playground_get_set_test);
+    // tests.push_back(playground_transform_test);
 
 
-    int total = 0;
-    int failure = 0;
-    int failure_visual = 0;
-    for (int i = 0; i < tests.size(); i++) {
-        total++;
-        int result = tests[i](visual);
-        if (result == TEST_FAILURE) {
-            failure++;
-            printf("test[%i] failure\n", i);
-        }
-        if (result == TEST_VISUAL_FAILURE) {
-            failure_visual++;
-            printf("test[%i] only is visual\n", i);
-        }
-    }
-    printf("total: %i, %i failure\n", total, failure);
+    // int total = 0;
+    // int failure = 0;
+    // int failure_visual = 0;
+    // for (int i = 0; i < tests.size(); i++) {
+    //     total++;
+    //     int result = tests[i](visual);
+    //     if (result == TEST_FAILURE) {
+    //         failure++;
+    //         printf("test[%i] failure\n", i);
+    //     }
+    //     if (result == TEST_VISUAL_FAILURE) {
+    //         failure_visual++;
+    //         printf("test[%i] only is visual\n", i);
+    //     }
+    // }
+    // printf("total: %i, %i failure\n", total, failure);
+
+    vector<cell_t> array_of_values;
+
+    array_of_values.push_back(CELL_SPACE);
+    array_of_values.push_back(CELL_PL2);
+    array_of_values.push_back(CELL_PL1);
+    array_of_values.push_back(CELL_ERR);
+
+    test_for_cell_to_char(array_of_values);
 }

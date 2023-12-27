@@ -124,11 +124,14 @@ void test_for_move() {
     
 }
 
+
+
 void test_for_get_who_moves() {
     playground gp = playground();
 
     cell_t res = gp.get_who_moves();
-    if (res == 1) {
+    gp.swap_players();
+    if (res == 1 && gp.get_who_moves() == 2) {
         cout << "success" << endl;
     } else {
         cout << "fail" << endl;

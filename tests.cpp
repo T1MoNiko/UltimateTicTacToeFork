@@ -124,6 +124,29 @@ void test_for_move() {
     
 }
 
+void test_for_swap_players() {
+    playground gp = playground();
+
+    if ((cell_t)(gp.get_ground()[20] & 0b1100) == 4) {
+        gp.swap_players();
+
+        if ((cell_t)(gp.get_ground()[20] & 0b1100) == 8) {
+            cout << "success" << endl;
+        } else {
+            cout << "fail" << endl;
+        } 
+    }
+    else if ((cell_t)(gp.get_ground()[20] & 0b1100) == 8) {
+        gp.swap_players();
+        if ((cell_t)(gp.get_ground()[20] & 0b1100) == 4) {
+            cout << "success" << endl;
+        } else {
+            cout << "fail" << endl;
+        }
+    } else {
+        cout << "error" << endl;
+    };
+}
 
 
 void test_for_get_who_moves() {
@@ -131,6 +154,7 @@ void test_for_get_who_moves() {
 
     cell_t res = gp.get_who_moves();
     gp.swap_players();
+
     if (res == 1 && gp.get_who_moves() == 2) {
         cout << "success" << endl;
     } else {
@@ -223,4 +247,5 @@ int main(int argc, char** argv)
     // test_for_cell_to_char(array_of_values);
 
     test_for_get_who_moves();
+    test_for_swap_players();
 }

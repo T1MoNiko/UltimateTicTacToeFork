@@ -15,6 +15,13 @@ public:
     sf::Color ErrorColor;
 };
 
+enum EElementType { // первые 8 бит для первых родителей, вторые 8 для вторых родителей итд. для финальных детей используй последние 8 бит (считай первый - послений как слева направо)
+    ELEMENT = 0b1000000000000000000000000000000000000000000000000000000000000000,
+    BOX     = 0b1000000010000000000000000000000000000000000000000000000000000000,
+    GRID    = 0b1000000010000000000000000000000000000000000000000000000000000001,
+    CELL    = 0b1000000010000000100000000000000000000000000000000000000000000000,
+};
+
 
 class Element : public sf::Transformable, public sf::Drawable
 {
@@ -25,6 +32,7 @@ public:
 
     virtual void processClick(sf::Vector2u& pos) = 0;
 
+    virtual EElementType GetType() { return EElementType::ELEMENT; }
 protected:
     sf::Vector2f size;
     Resources& resources;
@@ -42,6 +50,7 @@ public:
 
     std::vector<Element*> Childs;
 
+    EElementType GetType() override { return EElementType::BOX; }
 private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };
@@ -86,6 +95,8 @@ public:
     virtual void processClick(sf::Vector2u& pos) = 0;
 
     virtual cell_t CellType() = 0;
+
+    EElementType GetType() override { return EElementType::CELL; }
 private:
 
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
@@ -155,11 +166,16 @@ class Grid : public Box
 {
 public:
 
-    Grid(void (*click_event_handler)(pos_t* poses, int poses_len, Grid& sender), unsigned int nested_grids, sf::Vector2f size, Resources& resources);
+    Grid(void (*click_event_handler)(pos_t* poses, int poses_len, Element* sender), unsigned int nested_grids, sf::Vector2f size, Resources& resources);
 
     void processClick(sf::Vector2u& pos) override;
 
-    void setCell(pos_t* posses, cell_t cell);
+    void setCell(pos_t* posses, int posses_len, cell_t cell);
+
+    /// @brief ищет клетку (кординаты / позиция / x, y), куда указывает coord (минимум 0, максимум GetSize())
+    pos_t getCellByCoord(sf::Vector2f coord);
+
+    EElementType GetType() override { return EElementType::GRID; }
 private:
 
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

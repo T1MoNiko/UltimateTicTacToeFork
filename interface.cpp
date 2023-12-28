@@ -122,7 +122,7 @@ void Cell_Error::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 
 
 
-Grid::Grid(void (*click_event_handler)(pos_t* poses, int poses_len, Grid& sender), unsigned int nested_grids, sf::Vector2f size, Resources& resources) 
+Grid::Grid(void (*click_event_handler)(pos_t* poses, int poses_len, Element* sender), unsigned int nested_grids, sf::Vector2f size, Resources& resources) 
     : Box(size, resources), click_event_handler(click_event_handler) 
 {
     sf::Vector2f cell_size = (size) / 3.0f * 0.95f;
@@ -133,8 +133,8 @@ Grid::Grid(void (*click_event_handler)(pos_t* poses, int poses_len, Grid& sender
     
 
     if (nested_grids > 0)
-        for (int x = 0; x < 3; ++x)
-            for (int y = 0; y < 3; ++y)
+        for (int y = 0; y < 3; ++y)
+            for (int x = 0; x < 3; ++x)
             {
                 Childs.push_back(nullptr);
                 Childs[Childs.size()-1] = new Grid(nullptr, nested_grids - 1, cell_size, resources);
@@ -142,31 +142,92 @@ Grid::Grid(void (*click_event_handler)(pos_t* poses, int poses_len, Grid& sender
                     sf::Vector2f(cell_def_size.x * x, cell_def_size.y * y) + delta_pos);
             }
     if (nested_grids == 0)
-        for (int x = 0; x < 3; ++x)
-            for (int y = 0; y < 3; ++y)
+        for (int y = 0; y < 3; ++y)
+            for (int x = 0; x < 3; ++x)
             {
                 Childs.push_back(nullptr);
-                Childs[Childs.size()-1] = new Cell_Cross(cell_size, resources);
+                Childs[Childs.size()-1] = new Cell_Space(cell_size, resources);
                 Childs[Childs.size()-1]->setPosition(
                     sf::Vector2f(cell_def_size.x * x, cell_def_size.y * y) + delta_pos);
             }
 }
 
 void Grid::processClick(sf::Vector2u& pos) {
-    Box::processClick(pos);
-    sf::Vector2f rel_pos = (sf::Vector2f)pos - getPosition();
-    if (rel_pos.x > size.x || rel_pos.y > size.y) return;
+    size_t actual_size = 2;
+    size_t posses_len = 0;
+    pos_t* posses = (pos_t*)malloc(sizeof(*posses) * actual_size);
 
-    rel_pos = sf::Vector2f(rel_pos.x / size.x * 9.0f, rel_pos.y / size.y * 9.0f);
+    
+    Grid* temp_grid = this;
+    Element* temp_elem;
+    static sf::Vector2f temp_pos;
+    temp_pos = (sf::Vector2f)pos;
+    temp_pos -= getPosition();
+    do {
+        posses[posses_len++] = temp_grid->getCellByCoord(temp_pos);
+        
+        if (posses_len >= actual_size) {
+            actual_size *= 2;
+            posses = (pos_t*)realloc(posses, sizeof(*posses) * actual_size);
+        }
+        
+        static size_t index;
+        index = pos_to_index(posses[posses_len-1], 3);
+        
+        if (index >= 9) break;
+        temp_elem = temp_grid->Childs[index]; 
+        if (temp_elem->GetType() == EElementType::GRID) {
+            temp_grid = (Grid*)temp_elem;
+            temp_pos -= temp_grid->getPosition();
+        }
+        else break;
+    } while (true);
 
-    // pos_t* posses = (pos_t*)malloc((*posses) * 2); // 2 это максимальное вложенное количество сеток, как-то так ЕСЛИ ЧТО_ТО СЛОМАЛОСЬ, ТО ТУТ ТОЖЕ МОЖЕТ БЫТЬ ПРИЧИНА
-    // if (click_event_handler != nullptr) click_event_handler(coord_to_pos(rel_pos.x, rel_pos.y));
 
+    if (click_event_handler != nullptr) click_event_handler(posses, posses_len, this);
+
+
+    free(posses);
 }
 
-void Grid::setCell(pos_t* posses, cell_t cell) 
+void Grid::setCell(pos_t* posses, int posses_len, cell_t cell) 
 {
-    printf("SETTING CELL IS NOT IMPLEMENTED!!\n");
+    printf("click on\n");
+    for (int i = 0; i < posses_len; ++i) {
+        static unsigned char x, y;
+        pos_to_coord(x, y, posses[i]);
+        printf("x: %i, y: %i;\n", (int)x, (int)y);
+    }
+    printf("(try to set \'%c\' cell)\n\n", cell_to_char(cell));
+
+    Grid* grid = this;
+    for (size_t i = 0; i < posses_len-1; ++i) {
+        grid = (Grid*)grid->Childs[pos_to_index(posses[i], 3)];
+    }
+    void* cellp = grid->Childs[pos_to_index(posses[posses_len-1], 3)];
+    delete grid->Childs[pos_to_index(posses[posses_len-1], 3)];
+
+    sf::Vector2f cell_size = (grid->GetSize()) / 3.0f * 0.95f;
+    sf::Vector2f cell_def_size = (grid->GetSize()) / 3.0f;
+    sf::Vector2f delta_pos = (cell_def_size - cell_size) / 2.0f;
+
+         if (cell == CELL_PL1)   grid->Childs[pos_to_index(posses[posses_len-1], 3)] = new Cell_Cross (cell_size, grid->resources);
+    else if (cell == CELL_PL2)   grid->Childs[pos_to_index(posses[posses_len-1], 3)] = new Cell_Circle(cell_size, grid->resources);
+    else if (cell == CELL_SPACE) grid->Childs[pos_to_index(posses[posses_len-1], 3)] = new Cell_Space (cell_size, grid->resources);
+    else                         grid->Childs[pos_to_index(posses[posses_len-1], 3)] = new Cell_Error (cell_size, grid->resources);
+    
+    static unsigned char x, y;
+    pos_to_coord(x, y, posses[posses_len-1]);
+
+    grid->Childs[pos_to_index(posses[posses_len-1], 3)]->setPosition(
+                    sf::Vector2f(cell_def_size.x * x, cell_def_size.y * y) + delta_pos);
+}
+
+pos_t Grid::getCellByCoord(sf::Vector2f coord) {
+    static sf::Vector2i rel_pos;
+    rel_pos = sf::Vector2i(coord.x / size.x * 3.0f, coord.y / size.y * 3.0f);
+    if (rel_pos.x >= 3 || rel_pos.y >= 3) return POS_MAX;
+    return coord_to_pos(rel_pos.x, rel_pos.y);
 }
 
 void Grid::draw(sf::RenderTarget& target, sf::RenderStates states) const {

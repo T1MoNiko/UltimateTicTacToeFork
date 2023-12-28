@@ -247,11 +247,11 @@ bool playground::move(pos_t pos) {
     wanna_move_box_p = (pos & 0b1111) % PLAYGROUND_SIDE_SIZE;
     wanna_move_box_p |= ((pos >> 4) % PLAYGROUND_SIDE_SIZE) << 4;
 
-    printf("1st condition: (%i || %i) && %i\n", (should_move_box_p >> 4 < 3)?1:0, (should_move_box_p & 0b1111 < 3)?1:0, (wanna_move_box_p != should_move_box_p)?1:0);
+    // printf("1st condition: (%i || %i) && %i\n", (should_move_box_p >> 4 < 3)?1:0, (should_move_box_p & 0b1111 < 3)?1:0, (wanna_move_box_p != should_move_box_p)?1:0);
     if ((should_move_box_p >> 4 < 3 || should_move_box_p & 0b1111 < 3) && wanna_move_box_p != should_move_box_p) return false;
 
     cell_t who_move = get_who_moves();
-    printf("2st condition: %i && %i\n", (who_move != CELL_PL1)?1:0, (who_move != CELL_PL2)?1:0);
+    // printf("2st condition: %i && %i\n", (who_move != CELL_PL1)?1:0, (who_move != CELL_PL2)?1:0);
     if (who_move != CELL_PL1 && who_move != CELL_PL2) return false;
 
     set_cell(pos, who_move);

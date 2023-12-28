@@ -121,7 +121,31 @@ int playground_get_set_test(bool visual)
 
 
 void test_for_move() {
-    
+    playground gp = playground();
+
+    int count = 0;
+    int success = 0;
+    int fail = 0;
+
+    for (int i = 0; i < PLAYGROUND_BYTES; i++) gp.get_ground()[i] = 0;
+    // for (int i = 7; i < PLAYGROUND_BYTES - 10; i++) gp.get_ground()[i] = 2;
+    // for (int i = 14; i < PLAYGROUND_BYTES; i++) gp.get_ground()[i] = 3;
+
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            if(gp.move(j, i)) {
+                printf("move %d & %d - success\n", j, i);
+                success++;
+            } else {
+                printf("move %d & %d - fail\n", j, i);
+                fail++;
+            }
+            count++;
+            cout << count << endl;
+        }
+    }
+    cout << "Количсетво успешных ходов: " << success << endl;
+    cout << "Количсетво фейлов ходов: " << fail << endl;
 }
 
 void test_for_swap_players() {
@@ -248,4 +272,6 @@ int main(int argc, char** argv)
 
     test_for_get_who_moves();
     test_for_swap_players();
+    test_for_move();
+
 }
